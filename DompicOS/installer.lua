@@ -6,7 +6,7 @@ term.clear()
 local version = "1.0.0"
 
 -- ÄNDRA DENNA TILL DIN GITHUB-LÄNK
-local github = "https://raw.githubusercontent.com/DITT_NAMN/DompicOS/main/"
+local github = "https://raw.githubusercontent.com/Dompinator/DompicOS/main/"
 
 print("================================")
 print("        DompicOS Installer")
