@@ -1,52 +1,51 @@
--- DompicOS Installer
+-- DompicOS Online Installer
 
 term.setBackgroundColor(colors.black)
 term.clear()
 
-print("DompicOS Installer")
+local version = "1.0.0"
+
+-- ÄNDRA DENNA TILL DIN GITHUB-LÄNK
+local github = "https://raw.githubusercontent.com/DITT_NAMN/DompicOS/main/"
+
+print("================================")
+print("        DompicOS Installer")
+print("================================")
 print("")
+print("Version: " .. version)
+print("")
+
 sleep(1)
 
-local package = "dompicos_package"
 
-if not fs.exists(package) then
-    print("ERROR: dompicos_package missing!")
-    return
-end
+local function download(url, path)
+    print("Installing: " .. path)
 
-local function copyFile(from, to)
-    local input = fs.open(from, "rb")
-    local output = fs.open(to, "wb")
+    local response = http.get(url)
 
-    output.write(input.readAll())
+    if response then
+        local file = fs.open(path, "w")
+        file.write(response.readAll())
+        file.close()
+        response.close()
 
-    input.close()
-    output.close()
-end
-
-local function copyFolder(from, to)
-    if not fs.exists(to) then
-        fs.makeDir(to)
-    end
-
-    for _, file in ipairs(fs.list(from)) do
-        local oldPath = from .. "/" .. file
-        local newPath = to .. "/" .. file
-
-        if fs.isDir(oldPath) then
-            copyFolder(oldPath, newPath)
-        else
-            copyFile(oldPath, newPath)
-        end
+        print(" [OK]")
+    else
+        print(" [FAILED]")
     end
 end
 
 
-print("Installing DompicOS...")
-print("")
+local function makeDir(path)
+    if not fs.exists(path) then
+        fs.makeDir(path)
+    end
+end
 
-local items = {
-    "startup.lua",
+
+print("Creating folders...")
+
+local folders = {
     "apps",
     "system",
     "websites",
@@ -54,26 +53,57 @@ local items = {
     "sounds"
 }
 
-for _, item in ipairs(items) do
-    local source = package .. "/" .. item
+for _, folder in ipairs(folders) do
+    makeDir(folder)
+end
 
-    if fs.exists(source) then
-        if fs.isDir(source) then
-            copyFolder(source, item)
-        else
-            copyFile(source, item)
-        end
+print("Folders created!")
+print("")
 
-        print("[OK] " .. item)
-    end
 
-    sleep(0.3)
+local files = {
+
+    -- Main system
+    "startup.lua",
+
+    -- System
+    "system/settings.lua",
+    "system/boot_animation.lua",
+    "system/version.cfg",
+
+    -- Apps
+    "apps/browser.lua",
+    "apps/explorer.lua",
+    "apps/settings.lua",
+
+    -- Websites
+    "websites/dompic.home.lua",
+    "websites/dompic.dfe.lua",
+
+    -- Sounds
+    "sounds/startup_sound.dfpwm"
+}
+
+
+print("Downloading DompicOS files...")
+print("")
+
+
+for _, file in ipairs(files) do
+    download(
+        github .. file,
+        file
+    )
+
+    sleep(0.2)
 end
 
 
 print("")
-print("Installation complete!")
-print("Restarting in 3 seconds...")
+print("================================")
+print(" Installation complete!")
+print(" Restarting...")
+print("================================")
 
 sleep(3)
 
