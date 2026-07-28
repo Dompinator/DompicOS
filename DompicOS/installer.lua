@@ -58,6 +58,41 @@ local function installFolder(apiPath, localPath)
         return
     end
 
+    local data = textutils.unserializeJSON(response.readAll())
+    response.close()
+
+    for _, item in ipairs(data) do
+
+        local path = localPath
+
+        if path ~= "" then
+            path = path .. "/"
+        end
+
+        path = path .. item.name
+
+        if item.type == "file" then
+
+            downloadFile(
+                rawBase .. path,
+                path
+            )
+
+        elseif item.type == "dir" then
+
+            if not fs.exists(path) then
+                fs.makeDir(path)
+            end
+
+            installFolder(
+                item.url,
+                path
+            )
+
+        end
+    end
+end
+
 
     local data = textutils.unserializeJSON(response.readAll())
     response.close()
