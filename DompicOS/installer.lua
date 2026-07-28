@@ -3,8 +3,8 @@
 term.setBackgroundColor(colors.black)
 term.clear()
 
-local githubAPI = "https://api.github.com/repos/Dompinator/DompicOS/contents/DompicOS"
 local rawBase = "https://raw.githubusercontent.com/Dompinator/DompicOS/main/DompicOS/"
+local apiBase = "https://api.github.com/repos/Dompinator/DompicOS/contents/DompicOS"
 
 print("================================")
 print("       DompicOS Installer")
@@ -13,13 +13,6 @@ print("================================")
 print("")
 
 sleep(1)
-
-
-local function makeDir(path)
-    if not fs.exists(path) then
-        fs.makeDir(path)
-    end
-end
 
 
 local function downloadFile(url, path)
@@ -37,12 +30,10 @@ local function downloadFile(url, path)
         response.close()
 
         print(" [OK]")
-        return true
 
     else
 
         print(" [FAILED]")
-        return false
 
     end
 end
@@ -61,91 +52,50 @@ local function installFolder(apiPath, localPath)
     local data = textutils.unserializeJSON(response.readAll())
     response.close()
 
+
     for _, item in ipairs(data) do
 
-        local path = localPath
+        local newPath
 
-        if path ~= "" then
-            path = path .. "/"
+        if localPath == "" then
+            newPath = item.name
+        else
+            newPath = localPath .. "/" .. item.name
         end
 
-        path = path .. item.name
 
         if item.type == "file" then
 
             downloadFile(
-                rawBase .. path,
-                path
+                rawBase .. newPath,
+                newPath
             )
+
 
         elseif item.type == "dir" then
 
-            if not fs.exists(path) then
-                fs.makeDir(path)
+            if not fs.exists(newPath) then
+                fs.makeDir(newPath)
             end
 
             installFolder(
                 item.url,
-                path
+                newPath
             )
 
         end
+
     end
+
 end
 
 
-    local data = textutils.unserializeJSON(response.readAll())
-    response.close()
-
-
-    for _, item in ipairs(data) do
-
-        local name = item.name
-        local type = item.type
-
-        local newLocalPath = localPath .. "/" .. name
-        local newAPIPath = item.url
-
-
-        if type == "file" then
-
-            downloadFile(
-                rawBase .. newLocalPath,
-                newLocalPath
-            )
-
-
-        elseif type == "dir" then
-
-            makeDir(newLocalPath)
-
-            installFolder(
-                newAPIPath,
-                newLocalPath
-            )
-
-        end
-    end
-end
-
-
-
-print("Creating folders...")
-print("")
-
-makeDir("apps")
-makeDir("system")
-makeDir("websites")
-makeDir("images")
-makeDir("sounds")
-
-print("")
 print("Downloading DompicOS...")
 print("")
 
 
 installFolder(
-    githubAPI,
+    apiBase,
     ""
 )
 
