@@ -1,38 +1,18 @@
--- DompicOS Online Installer
+-- DompicOS Online Installer v2
 
 term.setBackgroundColor(colors.black)
 term.clear()
 
-local version = "1.0.0"
-
--- ÄNDRA DENNA TILL DIN GITHUB-LÄNK
-local github = "https://raw.githubusercontent.com/Dompinator/DompicOS/main/DompicOS/"
+local githubAPI = "https://api.github.com/repos/Dompinator/DompicOS/contents/DompicOS"
+local rawBase = "https://raw.githubusercontent.com/Dompinator/DompicOS/main/DompicOS/"
 
 print("================================")
-print("        DompicOS Installer")
+print("       DompicOS Installer")
+print("             v2.0")
 print("================================")
-print("")
-print("Version: " .. version)
 print("")
 
 sleep(1)
-
-
-local function download(url, path)
-    print("Installing: " .. path)
-
-    if fs.exists(path) then
-        fs.delete(path)
-    end
-
-    local ok = shell.run("wget", url, path)
-
-    if ok then
-        print(" [OK]")
-    else
-        print(" [FAILED]")
-    end
-end
 
 
 local function makeDir(path)
@@ -42,60 +22,97 @@ local function makeDir(path)
 end
 
 
+local function downloadFile(url, path)
+
+    print("Installing: " .. path)
+
+    local response = http.get(url)
+
+    if response then
+
+        local file = fs.open(path, "w")
+        file.write(response.readAll())
+        file.close()
+
+        response.close()
+
+        print(" [OK]")
+        return true
+
+    else
+
+        print(" [FAILED]")
+        return false
+
+    end
+end
+
+
+local function installFolder(apiPath, localPath)
+
+    local response = http.get(apiPath)
+
+    if not response then
+        print("Cannot access:")
+        print(apiPath)
+        return
+    end
+
+
+    local data = textutils.unserializeJSON(response.readAll())
+    response.close()
+
+
+    for _, item in ipairs(data) do
+
+        local name = item.name
+        local type = item.type
+
+        local newLocalPath = localPath .. "/" .. name
+        local newAPIPath = item.url
+
+
+        if type == "file" then
+
+            downloadFile(
+                rawBase .. newLocalPath,
+                newLocalPath
+            )
+
+
+        elseif type == "dir" then
+
+            makeDir(newLocalPath)
+
+            installFolder(
+                newAPIPath,
+                newLocalPath
+            )
+
+        end
+    end
+end
+
+
+
 print("Creating folders...")
+print("")
 
-local folders = {
-    "apps",
-    "system",
-    "websites",
-    "images",
-    "sounds"
-}
+makeDir("apps")
+makeDir("system")
+makeDir("websites")
+makeDir("images")
+makeDir("sounds")
 
-for _, folder in ipairs(folders) do
-    makeDir(folder)
-end
-
-print("Folders created!")
+print("")
+print("Downloading DompicOS...")
 print("")
 
 
-local files = {
-
-    -- Main system
-    "startup.lua",
-
-    -- System
-    "system/settings.lua",
-    "system/boot_animation.lua",
-    "system/version.cfg",
-
-    -- Apps
-    "apps/browser.lua",
-    "apps/explorer.lua",
-    "apps/settings.lua",
-
-    -- Websites
-    "websites/dompic.home.lua",
-    "websites/dompic.dfe.lua",
-
-    -- Sounds
-    "sounds/startup_sound.dfpwm"
-}
-
-
-print("Downloading DompicOS files...")
-print("")
-
-
-for _, file in ipairs(files) do
-    download(
-        github .. file,
-        file
-    )
-
-    sleep(0.2)
-end
+installFolder(
+    githubAPI,
+    ""
+)
 
 
 print("")
