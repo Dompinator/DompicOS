@@ -21,14 +21,13 @@ sleep(1)
 local function download(url, path)
     print("Installing: " .. path)
 
-    local response = http.get(url)
+    if fs.exists(path) then
+        fs.delete(path)
+    end
 
-    if response then
-        local file = fs.open(path, "w")
-        file.write(response.readAll())
-        file.close()
-        response.close()
+    local ok = shell.run("wget", url, path)
 
+    if ok then
         print(" [OK]")
     else
         print(" [FAILED]")
