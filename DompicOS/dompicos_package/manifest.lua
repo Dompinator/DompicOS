@@ -17,7 +17,7 @@ return {
     "system/notifications.lua",
     "system/notify.lua",
 
-    "sounds/startup_sound.dfpwm",
+    "Sounds/startup_sound.dfpwm",
 
     "images/dfe_logo.nfp",
 
