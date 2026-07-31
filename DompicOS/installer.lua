@@ -7,6 +7,16 @@ print("DompicOS Installer")
 print("")
 sleep(1)
 
+print("Downloading DompicOS package...")
+print("")
+
+fs.makeDir("dompicos_package")
+
+shell.run("wget https://raw.githubusercontent.com/Dompinator/DompicOS/main/DompicOS/dompicos_package/startup.lua dompicos_package/startup.lua")
+
+print("Download complete!")
+sleep(1)
+
 local package = "dompicos_package"
 
 if not fs.exists(package) then
