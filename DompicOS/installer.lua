@@ -12,7 +12,7 @@ print("")
 
 fs.makeDir("dompicos_package")
 
-shell.run("wget https://raw.githubusercontent.com/Dompinator/DompicOS/main/DompicOS/dompicos_package/startup.lua dompicos_package/startup.lua")
+shell.run("wget https://raw.githubusercontent.com/Dompinator/DompicOS/refs/heads/main/DompicOS/dompicos_package/startup.lua dompicos_package/startup.lua")
 
 print("Download complete!")
 sleep(1)
