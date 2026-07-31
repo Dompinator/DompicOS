@@ -16,9 +16,8 @@ return {
     "system/display.cfg",
     "system/notifications.lua",
     "system/notify.lua",
-    "
 
-    "Sounds/startup_sound.dfpwm",
+    "sounds/startup_sound.dfpwm",
 
     "images/dfe_logo.nfp",
 
@@ -26,5 +25,5 @@ return {
     "websites/dompic.cursed.lua",
     "websites/dompic.cursed.home.lua",
     "websites/dompic.dfe.lua",
-    "websites/dompic.watcg.lua"
+    "websites/dompic.watch.lua"
 }
