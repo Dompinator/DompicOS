@@ -2,6 +2,22 @@
 
 local w, h = term.getSize()
 
+local nativeTerm = term.native()
+
+local function getDisplay()
+    if fs.exists("system/display.cfg") then
+        local f = fs.open("system/display.cfg", "r")
+        local side = f.readAll()
+        f.close()
+
+        if peripheral.isPresent(side) then
+            return peripheral.wrap(side)
+        end
+    end
+
+    return nil
+end
+
 -- DompicOS Boot Animation
 if fs.exists("system/boot_animation.lua") then
     shell.run("system/boot_animation.lua")
@@ -67,164 +83,185 @@ local function drawDesktop()
 
     local bg = settings.background
 
+    local oldTerm = term.current()
 
-    if bg == "bright_orange" then
+    local screens = {oldTerm}
 
-        term.setBackgroundColor(colors.orange)
+    local display = getDisplay()
 
-    else
-
-        term.setBackgroundColor(
-            colors[bg] or colors.blue
-        )
-
+    if display then
+        table.insert(screens, display)
     end
 
 
-    term.clear()
+    for _, screen in ipairs(screens) do
+
+        term.redirect(screen)
+
+        local sw, sh = term.getSize()
+
+
+        if display and screen == display then
+    		display.setTextScale(0.5)
+	end
+
+
+        if bg == "bright_orange" then
+
+            term.setBackgroundColor(colors.orange)
+
+        else
+
+            term.setBackgroundColor(
+                colors[bg] or colors.blue
+            )
+
+        end
+
+
+        term.clear()
 
 
 
-    -- Taskbar
+        -- Taskbar
 
-    term.setBackgroundColor(colors.gray)
+        term.setBackgroundColor(colors.gray)
 
-    paintutils.drawFilledBox(
-        1,
-        h,
-        w,
-        h
-    )
-
-
-
-    -- Start button
-
-    term.setBackgroundColor(colors.orange)
-
-    paintutils.drawFilledBox(
-        1,
-        h,
-        5,
-        h
-    )
-
-
-    term.setTextColor(colors.white)
-
-    term.setCursorPos(3,h)
-
-    write(">")
+        paintutils.drawFilledBox(
+            1,
+            sh,
+            sw,
+            sh
+        )
 
 
 
-    -- Settings button
-
-    term.setBackgroundColor(colors.lightGray)
-
-    paintutils.drawFilledBox(
-        10,
-        h,
-        12,
-        h
-    )
-
-
-
-    -- Explorer button
-
-    term.setBackgroundColor(colors.yellow)
-
-    paintutils.drawFilledBox(
-        15,
-        h,
-        17,
-        h
-    )
-
-
-
-    -- Apps
-
-    local x = 3
-    local y = 3
-    local count = 0
-
-
-    local boxWidth = math.max(
-        3,
-        math.floor(7 * appSize)
-    )
-
-
-    local boxHeight = math.max(
-        2,
-        math.floor(3 * appSize)
-    )
-
-
-
-    for _, app in ipairs(apps) do
-
-
-        local name = getAppName(app)
-
+        -- Start button
 
         term.setBackgroundColor(colors.orange)
 
         paintutils.drawFilledBox(
-            x,
-            y,
-            x + boxWidth,
-            y + boxHeight
+            1,
+            sh,
+            5,
+            sh
         )
 
 
         term.setTextColor(colors.white)
 
-        term.setCursorPos(
-            x + 1,
-            y + 1
-        )
+        term.setCursorPos(3,sh)
 
-
-        write(
-            string.sub(name,1,boxWidth-1)
-        )
+        write(">")
 
 
 
-        table.insert(
-            appPositions,
-            {
-                name = app,
-                x = x,
-                y = y,
-                width = boxWidth,
-                height = boxHeight
-            }
+        -- Settings button
+
+        term.setBackgroundColor(colors.lightGray)
+
+        paintutils.drawFilledBox(
+            10,
+            sh,
+            12,
+            sh
         )
 
 
 
-        count = count + 1
+        -- Explorer button
+
+        term.setBackgroundColor(colors.yellow)
+
+        paintutils.drawFilledBox(
+            15,
+            sh,
+            17,
+            sh
+        )
 
 
 
-        if count >= 4 then
+        -- Apps
 
-            count = 0
-            x = 3
-            y = y + boxHeight + 2
+        local x = 3
+        local y = 3
+        local count = 0
 
-        else
 
-            x = x + boxWidth + 4
+        local boxWidth = math.max(
+            3,
+            math.floor(7 * appSize)
+        )
+
+
+        local boxHeight = math.max(
+            2,
+            math.floor(3 * appSize)
+        )
+
+
+        for _, app in ipairs(apps) do
+
+            local name = getAppName(app)
+
+
+            term.setBackgroundColor(colors.orange)
+
+            paintutils.drawFilledBox(
+                x,
+                y,
+                x + boxWidth,
+                y + boxHeight
+            )
+
+
+            term.setTextColor(colors.white)
+
+            term.setCursorPos(
+                x + 1,
+                y + 1
+            )
+
+
+            write(
+                string.sub(name,1,boxWidth-1)
+            )
+
+
+            table.insert(
+                appPositions,
+                {
+                    name = app,
+                    x = x,
+                    y = y,
+                    width = boxWidth,
+                    height = boxHeight
+                }
+            )
+
+
+            count = count + 1
+
+
+            if count >= 4 then
+
+                count = 0
+                x = 3
+                y = y + boxHeight + 2
+
+            else
+
+                x = x + boxWidth + 4
+
+            end
 
         end
 
-
     end
+
+
+    term.redirect(oldTerm)
 
 end
 
@@ -250,7 +287,7 @@ local function drawMenu()
     write("DompicOS")
 
     term.setCursorPos(3,h-7)
-    write("Version 1.0")
+    write("Version 1.1")
 
     term.setCursorPos(3,h-5)
     write("----------------")
