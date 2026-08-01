@@ -287,7 +287,7 @@ local function drawMenu()
     write("DompicOS")
 
     term.setCursorPos(3,h-7)
-    write("Version 1.1")
+    write("Version 1.1.5")
 
     term.setCursorPos(3,h-5)
     write("----------------")
