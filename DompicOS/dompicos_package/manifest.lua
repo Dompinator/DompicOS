@@ -25,5 +25,6 @@ return {
     "websites/dompic.cursed.lua",
     "websites/dompic.cursed.home.lua",
     "websites/dompic.dfe.lua",
+    "websites/dompic.ebi.lua",
     "websites/dompic.watch.lua"
 }
