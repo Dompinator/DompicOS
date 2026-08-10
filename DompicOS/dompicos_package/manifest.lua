@@ -15,6 +15,7 @@ return {
     "system/browser_history.cfg",
     "system/display.cfg",
     "system/notifications.lua",
+    "system/display_mirror.lua",
     "system/notify.lua",
 
     "Sounds/startup_sound.dfpwm",
