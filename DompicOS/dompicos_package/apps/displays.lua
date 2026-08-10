@@ -3,7 +3,7 @@ local displayFile = "system/display.cfg"
 local monitor = peripheral.find("monitor")
 
 term.clear()
-term.setCursorPos(1,1)
+term.setCursorPos(1, 1)
 
 print("Dompic Display")
 print("----------------")
@@ -33,6 +33,7 @@ if key == keys.one then
 
         if mon then
             mon.clear()
+            mon.setCursorPos(1, 1)
         end
 
         fs.delete(displayFile)
@@ -43,16 +44,19 @@ if key == keys.one then
 
         if monitor then
 
+            local side = peripheral.getName(monitor)
+
             local f = fs.open(displayFile, "w")
-            f.write(peripheral.getName(monitor))
+            f.write(side)
             f.close()
+
+            monitor.clear()
+            monitor.setCursorPos(1, 1)
 
             print("Monitor connected!")
 
         else
-
             print("No monitor found!")
-
         end
     end
 end
