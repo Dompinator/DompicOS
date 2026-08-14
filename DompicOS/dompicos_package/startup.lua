@@ -21,7 +21,13 @@ local function getDisplay()
     end
 
     if peripheral.isPresent(side) then
-        return peripheral.wrap(side)
+        if peripheral.getType(side) == "monitor" then
+            local monitor = peripheral.wrap(side)
+
+            if monitor and type(monitor.getSize) == "function" then
+                return monitor
+            end
+        end
     end
 
     return nil
@@ -109,6 +115,12 @@ local function redrawDisplay()
     refreshDisplay()
 
     if not display then
+        return
+    end
+
+    if type(display.getSize) ~= "function" then
+        display = nil
+        displaySide = nil
         return
     end
 
@@ -578,7 +590,7 @@ local function drawMenu()
     write("DompicOS")
 
     term.setCursorPos(3, h - 7)
-    write("Version 1.1.5")
+    write("Version 1.1.6")
 
     term.setCursorPos(3, h - 5)
     write("----------------")
